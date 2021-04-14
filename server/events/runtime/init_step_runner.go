@@ -23,6 +23,9 @@ func (i *InitStepRunner) Run(ctx models.ProjectCommandContext, extraArgs []strin
 		ctx.Log.Info("running terraform version %s so will use `get` instead of `init`", tfVersion)
 		terraformInitCmd = append([]string{"get", "-no-color", "-upgrade"}, extraArgs...)
 	}
+	if MustConstraint(">= 0.14.0").Check(tfVersion) {
+		terraformInitCmd = append([]string{"init", "-input=false", "-no-color"}, extraArgs...)
+	}
 
 	out, err := i.TerraformExecutor.RunCommandWithVersion(ctx.Log, path, terraformInitCmd, envs, tfVersion, ctx.Workspace)
 	// Only include the init output if there was an error. Otherwise it's
